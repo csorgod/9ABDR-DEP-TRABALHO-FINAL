@@ -37,8 +37,8 @@ Checklist de atividades para execução do trabalho final. Marque com `[✔]` co
   - [✔] Ordenar por UF, forma de pagamento, data de criação
 - [✔] 3.7 Logging — configurar `logging` na classe de lógica de negócios
 - [✔] 3.8 Tratamento de Erros — implementar `try/except` com logging do erro
-- [ ] 3.9 Pacote de Orquestração — classe que orquestra o pipeline (`src/pipeline/orchestrator.py`)
-- [ ] 3.10 Injeção de Dependências — montar `main.py` como aggregation root
+- [✔] 3.9 Pacote de Orquestração — classe que orquestra o pipeline (`src/pipeline/orchestrator.py`)
+- [✔] 3.10 Injeção de Dependências — montar `main.py` como aggregation root
 
 ## Fase 4 — Testes
 
