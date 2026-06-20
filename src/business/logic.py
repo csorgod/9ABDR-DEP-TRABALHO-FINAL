@@ -1,7 +1,11 @@
+import logging
+
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, year
 
 from config.settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class BusinessLogic:
@@ -30,18 +34,25 @@ class BusinessLogic:
         self._settings = settings
 
     def execute(self, df_pedidos: DataFrame, df_pagamentos: DataFrame) -> DataFrame:
-        df_pagamentos_filtrado = self._filtrar_pagamentos(df_pagamentos)
-        df_pedidos_filtrado = self._filtrar_pedidos_por_ano(df_pedidos)
-        df_joined = self._join_pedidos_pagamentos(df_pedidos_filtrado, df_pagamentos_filtrado)
-        df_selecionado = self._selecionar_colunas(df_joined)
-        df_ordenado = self._ordenar(df_selecionado)
-        return df_ordenado
+        try:
+            logger.info("Iniciando execução da lógica de negócio")
+            df_pagamentos_filtrado = self._filtrar_pagamentos(df_pagamentos)
+            df_pedidos_filtrado = self._filtrar_pedidos_por_ano(df_pedidos)
+            df_joined = self._join_pedidos_pagamentos(df_pedidos_filtrado, df_pagamentos_filtrado)
+            df_selecionado = self._selecionar_colunas(df_joined)
+            df_ordenado = self._ordenar(df_selecionado)
+            logger.info("Lógica de negócio finalizada com sucesso")
+            return df_ordenado
+        except Exception as e:
+            logger.error("Erro durante a execução da lógica de negócio: %s", e)
+            raise
 
     def _filtrar_pagamentos(self, df: DataFrame) -> DataFrame:
         """
         filtra pagamentos onde status == False (recusados) e avaliacao_fraude.fraude == False 
         (classificados como legítimos). 
         """
+        logger.info("Filtrando pagamentos recusados (status=false) e fraude legítima (fraude=false)")
         return df.filter(
             (col("status") == False) & (col("avaliacao_fraude.fraude") == False)
         )
@@ -51,6 +62,7 @@ class BusinessLogic:
         usa a função year() do PySpark para extrair o ano de DATA_CRIACAO e manter 
         apenas pedidos de 2025 (configuramos a regra em settings.ano_filtro)
         """
+        logger.info("Filtrando pedidos do ano de %d", self._settings.ano_filtro)
         return df.filter(year(col("DATA_CRIACAO")) == self._settings.ano_filtro)
 
     def _join_pedidos_pagamentos(self, df_pedidos: DataFrame, df_pagamentos: DataFrame) -> DataFrame:
@@ -59,6 +71,7 @@ class BusinessLogic:
          (o casing é diferente entre os datasets, por isso a comparação explícita entre 
          as duas colunas). Podiamos tratar esse campo, mas não estava no escopo do projeto.
         """
+        logger.info("Realizando join entre pedidos e pagamentos (ID_PEDIDO == id_pedido)")
         return df_pedidos.join(
             df_pagamentos,
             df_pedidos["ID_PEDIDO"] == df_pagamentos["id_pedido"],
@@ -74,6 +87,7 @@ class BusinessLogic:
         - valor_total = VALOR_UNITARIO * QUANTIDADE (calculado, não é o valor_pagamento)
         - data_pedido (alias de DATA_CRIACAO)
         """
+        logger.info("Selecionando colunas do relatório: id_pedido, UF, forma_pagamento, valor_total, data_pedido")
         return df.select(
             col("ID_PEDIDO").alias("id_pedido"),
             col("UF"),
@@ -84,4 +98,5 @@ class BusinessLogic:
 
     def _ordenar(self, df: DataFrame) -> DataFrame:
         """ ordena o resultado por UF, forma_pagamento e data_pedido """
+        logger.info("Ordenando resultado por UF, forma_pagamento e data_pedido")
         return df.orderBy("UF", "forma_pagamento", "data_pedido")
