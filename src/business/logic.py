@@ -1,6 +1,6 @@
 import logging
 
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, year
 
 from config.settings import Settings
@@ -28,8 +28,9 @@ class BusinessLogic:
     - O relatório deve ser gravado em formato parquet.
     """
 
-    def __init__(self, settings: Settings):
+    def __init__(self, spark: SparkSession, settings: Settings):
         self.logger = logging.getLogger(__name__)
+        self._spark = spark
         self._settings = settings
 
     def execute(self, df_pedidos: DataFrame, df_pagamentos: DataFrame) -> DataFrame:
@@ -102,3 +103,13 @@ class BusinessLogic:
         """ ordena o resultado por UF, forma_pagamento e data_pedido """
         self.logger.info("Ordenando resultado por UF, forma_pagamento e data_pedido")
         return df.orderBy("UF", "forma_pagamento", "data_pedido")
+
+    def validar_parquet(self) -> None:
+        """ relê o Parquet gerado e imprime shape + amostra no terminal e no log """
+        df_parquet = self._spark.read.parquet(self._settings.output_path)
+        num_linhas = df_parquet.count()
+        num_colunas = len(df_parquet.columns)
+        self.logger.info("Shape do Parquet: (%d linhas, %d colunas)", num_linhas, num_colunas)
+        self.logger.info("Colunas: %s", df_parquet.columns)
+        self.logger.info("Amostra do Parquet (20 primeiras linhas):")
+        df_parquet.show(20, truncate=False)

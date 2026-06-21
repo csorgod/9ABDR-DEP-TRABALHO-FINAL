@@ -23,7 +23,7 @@ def main():
     pedidos_reader = PedidosReader(spark, settings)
     pagamentos_reader = PagamentosReader(spark, settings)
     writer = ParquetWriter(settings)
-    business_logic = BusinessLogic(settings)
+    business_logic = BusinessLogic(spark, settings)
 
     pipeline = PipelineOrchestrator(
         pedidos_reader=pedidos_reader,

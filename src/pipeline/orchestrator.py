@@ -7,9 +7,9 @@ from business.logic import BusinessLogic
 
 class PipelineOrchestrator:
     """
-    Classe de orquestração do pipeline. Ela coordenará a ordem de execução 
+    Classe de orquestração do pipeline. Ela coordenará a ordem de execução
     dos passos e realizará logs para para passo a ser executado afim de manter
-    a rastreabilidade e identificar potenciais problemas com maior precisão 
+    a rastreabilidade e identificar potenciais problemas com maior precisão
     """
 
     def __init__(
@@ -39,5 +39,8 @@ class PipelineOrchestrator:
 
         self.logger.info("************************** Gravando relatório em Parquet")
         self._writer.write(df_resultado)
+
+        self.logger.info("************************** Validando arquivo Parquet gerado")
+        self._business_logic.validar_parquet()
 
         self.logger.info("Pipeline finalizado com sucesso")
