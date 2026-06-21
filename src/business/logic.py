@@ -35,22 +35,12 @@ class BusinessLogic:
     def execute(self, df_pedidos: DataFrame, df_pagamentos: DataFrame) -> DataFrame:
         try:
             self.logger.info("Iniciando execução da lógica de negócio")
-
-            self.logger.info("Pedidos recebidos: %d registros", df_pedidos.count())
-            self.logger.info("Pagamentos recebidos: %d registros", df_pagamentos.count())
-
             df_pagamentos_filtrado = self._filtrar_pagamentos(df_pagamentos)
-            self.logger.info("Pagamentos após filtro (status=false, fraude=false): %d registros", df_pagamentos_filtrado.count())
-
             df_pedidos_filtrado = self._filtrar_pedidos_por_ano(df_pedidos)
-            self.logger.info("Pedidos após filtro (ano=%d): %d registros", self._settings.ano_filtro, df_pedidos_filtrado.count())
-
             df_joined = self._join_pedidos_pagamentos(df_pedidos_filtrado, df_pagamentos_filtrado)
-            self.logger.info("Registros após join: %d", df_joined.count())
-
             df_selecionado = self._selecionar_colunas(df_joined)
             df_ordenado = self._ordenar(df_selecionado)
-            self.logger.info("Lógica de negócio finalizada com sucesso — %d registros no relatório final", df_ordenado.count())
+            self.logger.info("Lógica de negócio finalizada com sucesso")
             return df_ordenado
         except Exception as e:
             self.logger.error("Erro durante a execução da lógica de negócio: %s", e)
