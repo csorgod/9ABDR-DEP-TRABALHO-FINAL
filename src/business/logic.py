@@ -53,7 +53,7 @@ class BusinessLogic:
         """
         self.logger.info("Filtrando pagamentos recusados (status=false) e fraude legítima (fraude=false)")
         return df.filter(
-            (col("status") == False) & (col("avaliacao_fraude.fraude") == False)
+            (~col("status")) & (~col("avaliacao_fraude.fraude"))
         )
 
     def _filtrar_pedidos_por_ano(self, df: DataFrame) -> DataFrame:
