@@ -9,13 +9,15 @@ Membros do grupo:
 - Ludmila Rocha Silva: 372484
 - Thiago Guilherme: 375344
 
-## LEIA ANTES DE EXECUTAR:
+## ⚠️ LEIA ANTES DE EXECUTAR: ⚠️
 - Prezando pelas boas práticas do sistema de versinamento (SCM), segurança da informação e governança de dados, optamos por não versionar os dados direto no projeto. 
 - Optamos também por usar o pacote `pipenv` ao invés do gerenciador de pacote tradicional `pip` por alguns motivos:
     - Gerencia pacotes de forma descomplicada
     - Resolve conflitos entre dependencias de forma automática
     - Guarda hashes dos pacotes em um arquivo `.lock` (bem útil combinado docker)
     - Separa dependencias de `dev` com dependencias de `prod`
+
+### MÉTODO PRINCIPAL - Via Bash Script
 
  Para não perdermos a facilidade de execução como trade-off, criamos um script que abstrai todo o setup do projeto. O arquivo `run_program.sh` irá:
 
@@ -30,6 +32,28 @@ Portanto, para testar esse projeto, basta executar:
 ```sh
 bash run_program.py
 ```
+
+### MÉTODO ALTERNATIVO - Via Docker
+
+Requer apenas Docker instalado. Irá fazer todo o trabalho duro pra você (igual o méotodo principal, mas considerando a sequencia necesária pra imagem docker)
+
+#### Com docker compose
+```sh
+docker compose up --build
+```
+
+#### Sem docker compose
+
+```sh
+docker build -t dep-trabalho-final .
+docker run -v ./output:/app/output -v ./logs:/app/logs dep-trabalho-final
+```
+
+O Dockerfile irá cuidar de todo o ambiente (Python 3.11, Java 17, pipenv e dependências). O container apenas executa spark-submit src/main.py. Os volumes montados garantem que o Parquet gerado e os logs fiquem acessíveis na máquina host.
+
+**Por que não reutilizamos o `run_program.sh` dentro do Docker?**
+> O `run_program.sh` foi feito para setup em máquina local — ele baixa dados, instala pipenv, cria virtualenv e instala dependências. Dentro do Docker, tudo isso já é resolvido pelo `Dockerfile` durante o build. Reutilizá-lo no container significaria refazer trabalho desnecessário, depender de acesso à internet em runtime e criar um virtualenv dentro de um container (antipattern). Por isso o entrypoint do Docker executa apenas o `spark-submit`.
+
 
 ## SOBRE O PROJETO
 
@@ -87,7 +111,11 @@ Buscamos criar uma estrutura que consolide os aprendizados vistos em aula com as
 │   └── README.md                  # Documentação dos schemas e relacionamento entre datasets
 ├── logs/                          # Logs de execução do pipeline - não versionado
 ├── output/                        # Resultado do pipeline em formato Parquet - não versionado
-├── download_data.sh               # Script de setup: download dos dados, pipenv, dependências e execução
+├── Dockerfile                     # Imagem Docker do projeto (Python 3.11 + Java 17 + PySpark)
+├── docker-compose.yml             # Orquestração do container com volumes para output e logs
+├── docker-entrypoint.sh           # Entrypoint: baixa dados se necessário e executa o pipeline
+├── .dockerignore                  # Arquivos excluídos do contexto de build Docker
+├── run_program.sh                 # Script ponta a ponta: download dos dados, pipenv, dependências e execução
 ├── Pipfile                        # Dependências gerenciadas pelo pipenv
 ├── Pipfile.lock                   # Lock das versões exatas das dependências
 ├── pyproject.toml                 # Configuração de build e metadados do projeto

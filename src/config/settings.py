@@ -8,7 +8,7 @@ class Settings:
         self.app_name = "9ABDR-DEP-TRABALHO-FINAL"
         self.pedidos_path = os.path.join(base_dir, "data", "pedidos")
         self.pagamentos_path = os.path.join(base_dir, "data", "pagamentos")
-        self.output_path = os.path.join(base_dir, "output")
+        self.output_path = os.path.join(base_dir, "output", "relatorio")
         self.log_path = os.path.join(base_dir, "logs")
         self.pedidos_separator = ";"
         self.pedidos_header = True
