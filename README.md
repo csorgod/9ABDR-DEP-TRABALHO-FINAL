@@ -33,6 +33,12 @@ bash run_program.py
 
 ## SOBRE O PROJETO
 
+### PRÉ-REQUISITOS
+
+- Python 3.11+
+- Java 8 ou 11 (necessário para o PySpark)
+- pipenv (`pip install pipenv`)
+
 ### Escopo e sequencia de atividades
 Para centralizarmos o escopo e o passo a passo de execução, criamos dois arquivos na raiz do projeto: 
 - [ESCOPO.md](ESCOPO.md): O objetivo do trabalho, conforme registrado no portal do aluno. Esse conteúdo é identico ao original, apenas copiamos e colamos aqui em Markdown.
@@ -53,80 +59,52 @@ Buscamos criar uma estrutura que consolide os aprendizados vistos em aula com as
 ```
 9ABDR-DEP-TRABALHO-FINAL/
 ├── src/                           # Pacote principal da aplicação
-│   ├── main.py                    # Ponto de entrada (aggregation root)
+│   ├── main.py                    # Ponto de entrada (aggregation root) e injeção de dependências
+│   ├── __init__.py
 │   ├── config/
-│   │   └── settings.py            # Classe de configuração do projeto (caminhos, parâmetros, etc)
+│   │   ├── __init__.py
+│   │   ├── settings.py            # Classe de configuração centralizada (caminhos, parâmetros, etc)
+│   │   └── logging.py             # Configuração do logging (dictConfig para console e arquivo)
 │   ├── spark/
+│   │   ├── __init__.py
 │   │   └── session.py             # Classe de gerenciamento da SparkSession
 │   ├── data_io/
-│   │   ├── reader.py              # Classes de leitura de dados (CSV e JSON a priori)
-│   │   └── writer.py              # Classe de escrita de dados (Parquet)
+│   │   ├── __init__.py
+│   │   ├── reader.py              # Classes de leitura de dados (PedidosReader e PagamentosReader)
+│   │   └── writer.py              # Classe de escrita de dados em Parquet (ParquetWriter)
 │   ├── business/
-│   │   └── logic.py               # Classe de lógica de negócio (filtros, joins, transformações, etc)
+│   │   ├── __init__.py
+│   │   └── logic.py               # Classe de lógica de negócio (filtros, joins, transformações, validação)
 │   └── pipeline/
+│       ├── __init__.py
 │       └── orchestrator.py        # Classe de orquestração do pipeline
 ├── tests/
-│   └── test_logic.py              # Centralização dos testes
+│   ├── __init__.py
+│   └── test_logic.py              # Testes unitários da lógica de negócio
 ├── data/
-│   ├── pagamentos/                # Dataset de pagamentos (JSON) - não versionado
-│   └── pedidos/                   # Dataset de pedidos (CSV) - não versionado
+│   ├── pagamentos/                # Dataset de pagamentos (JSON gzip) - não versionado
+│   ├── pedidos/                   # Dataset de pedidos (CSV gzip) - não versionado
+│   └── README.md                  # Documentação dos schemas e relacionamento entre datasets
+├── logs/                          # Logs de execução do pipeline - não versionado
 ├── output/                        # Resultado do pipeline em formato Parquet - não versionado
+├── download_data.sh               # Script de setup: download dos dados, pipenv, dependências e execução
 ├── Pipfile                        # Dependências gerenciadas pelo pipenv
 ├── Pipfile.lock                   # Lock das versões exatas das dependências
 ├── pyproject.toml                 # Configuração de build e metadados do projeto
 ├── requirements.txt               # Dependências (fallback para pip install -r)
 ├── MANIFEST.in                    # Arquivos incluídos no pacote distribuível
+├── ESCOPO.md                      # Enunciado do trabalho (cópia do portal do aluno)
+├── TAREFAS.md                     # Checklist de atividades e progresso
 └── .gitignore                     # Regras de versionamento
 ```
 
-### Descrição dos pacotes
+### DESCRIÇÃO DOS PACOTES
 
 | Pacote | Responsabilidade |
 |---|---|
-| `src/config` | Centraliza todas as configurações do projeto (caminhos de entrada/saída, nome da aplicação, parâmetros de execução). |
-| `src/spark` | Gerencia a criação e o ciclo de vida da SparkSession. |
-| `src/data_io` | Leitura dos datasets de origem (pedidos em CSV, pagamentos em JSON) e escrita do relatório final em Parquet. Todos os schemas são definidos explicitamente. |
-| `src/business` | Contém as regras de negócio: filtros, joins e transformações. Inclui logging das etapas e tratamento de erros com try/except. |
-| `src/pipeline` | Orquestra a execução do pipeline de ponta a ponta (leitura → transformação → escrita). |
+| `src/config` | Centraliza todas as configurações do projeto (caminhos de entrada/saída, nome da aplicação, parâmetros de execução) e a configuração do logging (saída para console e arquivo). |
+| `src/spark` | Gerencia a criação e o ciclo de vida da SparkSession com lazy initialization. |
+| `src/data_io` | Leitura dos datasets de origem (pedidos em CSV, pagamentos em JSON) e escrita do relatório final em Parquet. Todos os schemas são definidos explicitamente, sem inferência. |
+| `src/business` | Contém as regras de negócio: filtros (status, fraude, ano), join entre pedidos e pagamentos, seleção de colunas, ordenação e validação do Parquet gerado. Inclui logging das etapas e tratamento de erros com try/except. |
+| `src/pipeline` | Orquestra a execução do pipeline de ponta a ponta (leitura → transformação → escrita → validação). |
 | `tests` | Testes unitários da lógica de negócio utilizando pytest. |
-
-### Dados
-
-Os datasets não são versionados no repositório. Para executar o projeto, clone os datasets do professor nas pastas correspondentes:
-
-- **Pagamentos (JSON):** copie os arquivos de `dataset-json-pagamentos/data/pagamentos/` para `data/pagamentos/`
-- **Pedidos (CSV):** copie os arquivos de `datasets-csv-pedidos/data/pedidos/` para `data/pedidos/`
-
-## Como executar
-
-### Pré-requisitos
-
-- Python 3.11+
-- Java 8 ou 11 (necessário para o PySpark)
-- pipenv (`pip install pipenv`)
-
-### Instalação das dependências
-
-```bash
-pipenv install
-```
-
-Para instalar também as dependências de desenvolvimento (pytest):
-
-```bash
-pipenv install --dev
-```
-
-### Executando o pipeline
-
-```bash
-pipenv run python src/main.py
-```
-
-O resultado será gravado em formato Parquet na pasta `output/`.
-
-### Executando os testes
-
-```bash
-pipenv run pytest
-```
