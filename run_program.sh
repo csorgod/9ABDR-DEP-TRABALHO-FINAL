@@ -32,7 +32,7 @@ echo "Pedidos:    $(ls "$DATA_DIR/pedidos/"*.csv.gz 2>/dev/null | wc -l) arquivo
 echo "Pagamentos: $(ls "$DATA_DIR/pagamentos/"*.json.gz 2>/dev/null | wc -l) arquivos"
 
 # ==============================
-# 2. Instalação do pipenv
+# 2. Instalação do pipenv (caso não exista ainda)
 # ==============================
 echo ""
 echo "=== Configurando ambiente Python ==="

@@ -9,15 +9,45 @@ Membros do grupo:
 - Ludmila Rocha Silva: 372484
 - Thiago Guilherme: 375344
 
-## TODOs: 
-- Dizer que o enunciado do trabalho está no arquivo `ESCOPO.md`
-- Adicionar disclaimer que não estamos versionando os dados pq não faz o menor sentido (Porque é uma péssima prática e pq é muito pesado pra manter isso no repo)
-- Dizer que não estamos usando pip e sim pipenv (e os porquês: Mais fácil gerenciar pacote, resolve conflitos sozinho, guarda hashes dos pacotes em um arquivo `.lock`, além de separar o que é dependencia dev e o que é prod)
-- Revisar e atualizar o "Estrutura do Projeto" e o "Descrição dos pacotes" ao final do trabalho
-- Apontar no projeto o que foi feito por IA e o que foi feito por humanos. Também adicionar essa informação aqui
-- Não vamos usar múltiplas branches com feature, bugfix, etc.. vamos fazer tudo na main para facilitar
+## LEIA ANTES DE EXECUTAR:
+- Prezando pelas boas práticas do sistema de versinamento (SCM), segurança da informação e governança de dados, optamos por não versionar os dados direto no projeto. 
+- Optamos também por usar o pacote `pipenv` ao invés do gerenciador de pacote tradicional `pip` por alguns motivos:
+    - Gerencia pacotes de forma descomplicada
+    - Resolve conflitos entre dependencias de forma automática
+    - Guarda hashes dos pacotes em um arquivo `.lock` (bem útil combinado docker)
+    - Separa dependencias de `dev` com dependencias de `prod`
 
-## Estrutura do Projeto
+ Para não perdermos a facilidade de execução como trade-off, criamos um script que abstrai todo o setup do projeto. O arquivo `run_program.sh` irá:
+
+* Baixar os dados para as pastas `data/pagamentos` e `data/pedidos`;
+* Instala o pacote `pipenv`
+* Cria um ambiente virtual `pipenv`
+* Instala todas as dependencias
+* Executa `spark-submit src/main.py` 
+
+Portanto, para testar esse projeto, basta executar:
+
+```sh
+bash run_program.py
+```
+
+## SOBRE O PROJETO
+
+### Escopo e sequencia de atividades
+Para centralizarmos o escopo e o passo a passo de execução, criamos dois arquivos na raiz do projeto: 
+- [ESCOPO.md](ESCOPO.md): O objetivo do trabalho, conforme registrado no portal do aluno. Esse conteúdo é identico ao original, apenas copiamos e colamos aqui em Markdown.
+- [TAREFAS.md](TAREFAS.md): Uma abstração do escopo em entregáveis e a ordem que seguimos.
+
+### Uso de IA
+Esse projeto foi feito ~90% por humanos e ~10% por IA Generativa. Acreditamos que a tecnologia tem um papel fundamental como acelerador do processo de entrega. Por isso, você encontrará partes do projeto organizadas ou escritas por IA, principalmente em arquivos `.md`. Por mais que a IA pudesse criar e entregar o projeto inteiro, entendemos que não faria sentido visto que a intenção do trabalho é consolidar os entendimentos dos alunos em relação à programação para Engenharia de Dados.
+
+### Github e SCM
+Sobre o sistema de versionamento, optamos por usar uma única branch (main) para simplificar o desenvolvimento e evitar conflitos dado o prazo apertado para entrega do projeto. Em um sistema real, provavelmente você encontraria algo similar à `git flow`, com branches para releases, bugfix, features, etc. 
+
+## TODOs: 
+- Revisar e atualizar o "Estrutura do Projeto" e o "Descrição dos pacotes" ao final do trabalho
+
+## ESTRUTURA DO PROJETO
 Buscamos criar uma estrutura que consolide os aprendizados vistos em aula com as boas práticas de mercado. Levamos em consideração tanto a separação de escopos como a modularização dos escopos. 
 
 ```
