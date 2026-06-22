@@ -11,13 +11,17 @@ ENV PYSPARK_PYTHON=python3
 
 RUN pip install --no-cache-dir pipenv
 
+RUN useradd -m -u 1000 appuser
+
 WORKDIR /app
 
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy
 
-COPY . .
+COPY --chown=appuser:appuser . .
 
-RUN mkdir -p logs output
+RUN mkdir -p logs output && chown appuser:appuser logs output
+
+USER appuser
 
 ENTRYPOINT ["bash", "docker-entrypoint.sh"]

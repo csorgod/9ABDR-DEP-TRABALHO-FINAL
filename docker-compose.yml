@@ -3,5 +3,4 @@ services:
     build: .
     container_name: dep-trabalho-final
     volumes:
-      - ./output:/app/output
       - ./logs:/app/logs
