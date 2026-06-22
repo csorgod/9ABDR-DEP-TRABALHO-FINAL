@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import tempfile
@@ -5,6 +6,8 @@ import tempfile
 from pyspark.sql import DataFrame
 
 from config.settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class ParquetWriter:
@@ -33,8 +36,8 @@ class ParquetWriter:
                         shutil.rmtree(item_path)
                     else:
                         os.remove(item_path)
-                except PermissionError:
-                    pass
+                except PermissionError as e:
+                    logger.warning("Não foi possível remover '%s': %s", item_path, e)
 
             for item in os.listdir(tmp_output):
                 shutil.move(
