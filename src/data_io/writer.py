@@ -14,6 +14,12 @@ class ParquetWriter:
         self._settings = settings
 
     def write(self, df: DataFrame) -> None:
+        """
+        A abordagem abaixo cria os arquivos parquet em um diretório temporário
+        e depois os move para a pasta output para evitar conflito na escrita
+        e leitura, bug ocorrendo no ambiente docker. Fizemos esse workarround 
+        para garantir a correta execução em qualquer ambiente.
+        """
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_output = os.path.join(tmp_dir, "parquet")
             df.write.parquet(tmp_output)
