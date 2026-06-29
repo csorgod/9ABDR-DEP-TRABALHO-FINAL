@@ -50,8 +50,15 @@ fi
 echo ""
 echo "=== Criando ambiente virtual e instalando dependências ==="
 
+PYTHON_BIN="$(command -v python3.11 || command -v python3 || command -v python)"
+if [ -z "$PYTHON_BIN" ]; then
+    echo "Nenhum interpretador Python encontrado no PATH." >&2
+    exit 1
+fi
+echo "Usando interpretador Python: $PYTHON_BIN"
+
 cd "$SCRIPT_DIR"
-pipenv install --dev
+pipenv install --dev --python "$PYTHON_BIN"
 
 # ==============================
 # 4. Execução do pipeline
