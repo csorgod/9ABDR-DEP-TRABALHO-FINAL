@@ -1,2 +1,5 @@
 pyspark>=3.5.0
 pytest>=8.0.0
+black
+build
+pytest-cov
