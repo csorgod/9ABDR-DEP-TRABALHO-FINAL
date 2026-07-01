@@ -17,15 +17,29 @@ Membros do grupo:
     - Guarda hashes dos pacotes em um arquivo `.lock` (bem útil combinado docker)
     - Separa dependencias de `dev` com dependencias de `prod`
 
-### MÉTODO PRINCIPAL - Via Bash Script
+### INSTRUÇÕES E PRÉ REQUISITOS
+
+Desenvolvemos o projeto de forma agnóstica à plataforma e sistema operacional. No entanto, como toda tecnologia, alguns requisitos mínimos são necessários para o correto funcionamento do projeto. Para facilitar a execução, criamos duas versões:
+
+* **Versão Lab AWS:** Funciona com um comando no ambiente AWS usado durante as aulas. Essa versão considera que a máquina contém:
+    * Python 3.11 ou superior
+    * pip como gerenciador de pacote (para a instalação do `pipenv`)
+    * Spark 
+
+* **Versão Docker:** Funciona em qualquer maquina com um ambiente docker incializado e executando. Ideal para execução fora do ambiente AWS usado em aulas. Essa versão considera que a maquina contém:
+
+* WSL 2.0 (Caso o sistema operacional seja windows)
+* Docker Desktop (e todo o back-end de criação e execução de containers)
+
+### Versão Lab AWS - Via Bash Script
 
  Para não perdermos a facilidade de execução como trade-off, criamos um script que abstrai todo o setup do projeto. O arquivo `run_program.sh` irá:
 
 * Baixar os dados para as pastas `data/pagamentos` e `data/pedidos`;
-* Instala o pacote `pipenv`
-* Cria um ambiente virtual `pipenv`
-* Instala todas as dependencias
-* Executa `spark-submit src/main.py` 
+* Instalar o pacote `pipenv`
+* Criar um ambiente virtual `pipenv`
+* Instalar todas as dependencias
+* Executar `spark-submit src/main.py` 
 
 Portanto, para testar esse projeto, basta executar:
 
@@ -35,7 +49,7 @@ bash run_program.py
 
 ### MÉTODO ALTERNATIVO - Via Docker
 
-Requer apenas Docker instalado. Irá fazer todo o trabalho duro pra você (igual o méotodo principal, mas considerando a sequencia necesária pra imagem docker)
+Requer apenas Docker instalado (e WSL em caso de Windows como S.O.). Irá fazer todo o trabalho duro pra você (igual o método principal, mas considerando a sequencia necessária pra imagem docker)
 
 #### Com docker compose
 ```sh
@@ -74,8 +88,6 @@ Esse projeto foi feito ~90% por humanos e ~10% por IA Generativa. Acreditamos qu
 ### Github e SCM
 Sobre o sistema de versionamento, optamos por usar uma única branch (main) para simplificar o desenvolvimento e evitar conflitos dado o prazo apertado para entrega do projeto. Em um sistema real, provavelmente você encontraria algo similar à `git flow`, com branches para releases, bugfix, features, etc. 
 
-## TODOs: 
-- Revisar e atualizar o "Estrutura do Projeto" e o "Descrição dos pacotes" ao final do trabalho
 
 ## ESTRUTURA DO PROJETO
 Buscamos criar uma estrutura que consolide os aprendizados vistos em aula com as boas práticas de mercado. Levamos em consideração tanto a separação de escopos como a modularização dos escopos. 
