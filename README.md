@@ -44,7 +44,7 @@ Desenvolvemos o projeto de forma agnóstica à plataforma e sistema operacional.
 Portanto, para testar esse projeto, basta executar:
 
 ```sh
-bash run_program.py
+bash run_program.sh
 ```
 
 ### MÉTODO ALTERNATIVO - Via Docker
@@ -67,6 +67,45 @@ O Dockerfile irá cuidar de todo o ambiente (Python 3.11, Java 17, pipenv e depe
 
 **Por que não reutilizamos o `run_program.sh` dentro do Docker?**
 > O `run_program.sh` foi feito para setup em máquina local — ele baixa dados, instala pipenv, cria virtualenv e instala dependências. Dentro do Docker, tudo isso já é resolvido pelo `Dockerfile` durante o build. Reutilizá-lo no container significaria refazer trabalho desnecessário, depender de acesso à internet em runtime e criar um virtualenv dentro de um container (antipattern). Por isso o entrypoint do Docker executa apenas o `spark-submit`.
+
+### TESTES UNITÁRIOS
+
+Os testes unitários cobrem as regras de negócio do pipeline (filtros, join, seleção de colunas, ordenação e execução completa). Eles utilizam `pytest` com DataFrames sintéticos, criados de forma independente dos dados reais e sem leitura/escrita em disco.
+
+**Pré-requisito:** ambiente `pipenv` configurado (o `run_program.sh` já faz isso, mas você pode rodar manualmente):
+
+```sh
+# Precisa já ter instalado o pipenv! "pip install pipenv"
+pipenv install --dev
+```
+
+**Executar os testes:**
+
+```sh
+pytest tests/
+```
+
+**Com saída detalhada (recomendado para validação):**
+
+```sh
+pytest tests/ -v
+```
+
+Para dados sobre a cobertura, utilize o pacote `pytest-cov` (já contido nas dependencias de desenvolvimento).
+
+```sh
+pytest tests/ --cov=src
+```
+
+Os 7 casos de teste cobrem:
+
+* Filtro de pagamentos com `status=True` ou `fraude=True` são removidos
+* Filtro de pedidos mantém apenas registros do ano 2025
+* Join entre pedidos e pagamentos retorna apenas a interseção correta
+* Seleção de colunas retorna o schema final esperado e calcula `valor_total` corretamente
+* Ordenação respeita a sequência `UF → forma_pagamento → data_pedido`
+* Execução completa (`execute`) retorna apenas os registros válidos
+* Colunas finais entregues pelo pipeline nunca mudam
 
 
 ## SOBRE O PROJETO
