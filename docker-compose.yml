@@ -4,3 +4,4 @@ services:
     container_name: dep-trabalho-final
     volumes:
       - ./logs:/app/logs
+      - ./output:/app/output
