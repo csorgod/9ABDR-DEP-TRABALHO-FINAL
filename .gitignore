@@ -34,7 +34,7 @@ output/*
 !output/.gitkeep
 
 # Dados (copiados localmente para execução)
-data/pagamentos/*
+data/pagamentos/*.json.gz
 !data/pagamentos/.gitkeep
-data/pedidos/*
+data/pedidos/*.csv.gz
 !data/pedidos/.gitkeep
