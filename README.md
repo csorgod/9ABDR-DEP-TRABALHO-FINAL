@@ -11,6 +11,9 @@ Membros do grupo:
 
 ## ⚠️ LEIA ANTES DE EXECUTAR: ⚠️
 - Prezando pelas boas práticas do sistema de versinamento (SCM), segurança da informação e governança de dados, optamos por não versionar os dados direto no projeto. 
+
+**DISCLAIMER:** Em um projeto real, esses dados provavelmente viriam de um `s3`, de um `minio`, algum `blob storage` ou similar. Para mantermos a simplicidade na execução, você verá que os dados estarão na pasta `data/` dentro do projeto. Essa prática não é recomendada em ambientes produtivos.
+
 - Optamos também por usar o pacote `pipenv` ao invés do gerenciador de pacote tradicional `pip` por alguns motivos:
     - Gerencia pacotes de forma descomplicada
     - Resolve conflitos entre dependencias de forma automática
@@ -26,10 +29,10 @@ Desenvolvemos o projeto de forma agnóstica à plataforma e sistema operacional.
     * pip como gerenciador de pacote (para a instalação do `pipenv`)
     * Spark 
 
-* **Versão Docker:** Funciona em qualquer maquina com um ambiente docker incializado e executando. Ideal para execução fora do ambiente AWS usado em aulas. Essa versão considera que a maquina contém:
+* **Versão Docker:** Funciona em qualquer maquina com um ambiente docker inicializado e em execução. Ideal para execução fora do ambiente AWS usado em aulas. Essa versão considera que a maquina contém:
 
-* WSL 2.0 (Caso o sistema operacional seja windows)
-* Docker Desktop (e todo o back-end de criação e execução de containers)
+    * WSL 2.0 (Caso o sistema operacional seja windows)
+    * Docker Desktop (e todo o back-end de criação e execução de containers)
 
 ### Versão Lab AWS - Via Bash Script
 
@@ -65,8 +68,10 @@ docker run -v ./output:/app/output -v ./logs:/app/logs dep-trabalho-final
 
 O Dockerfile irá cuidar de todo o ambiente (Python 3.11, Java 17, pipenv e dependências). O container apenas executa spark-submit src/main.py. Os volumes montados garantem que o Parquet gerado e os logs fiquem acessíveis na máquina host.
 
-**Por que não reutilizamos o `run_program.sh` dentro do Docker?**
-> O `run_program.sh` foi feito para setup em máquina local — ele baixa dados, instala pipenv, cria virtualenv e instala dependências. Dentro do Docker, tudo isso já é resolvido pelo `Dockerfile` durante o build. Reutilizá-lo no container significaria refazer trabalho desnecessário, depender de acesso à internet em runtime e criar um virtualenv dentro de um container (antipattern). Por isso o entrypoint do Docker executa apenas o `spark-submit`.
+### RESULTADOS
+
+Além do arquivo entregue no portal com as evidências, você verá o resultado da execução na pasta `output/` na raiz do projeto. Se estiver usando uma maquina docker para rodar o projeto, não se preocupe! Copiamos os arquivos do docker pro sistema de arquivos da sua máquina através do mapeamento de volumes presente no arquivo `docker-compose.yml`
+
 
 ### TESTES UNITÁRIOS
 
